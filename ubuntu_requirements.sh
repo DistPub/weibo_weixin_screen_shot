@@ -9,3 +9,6 @@ sudo apt-get install fonts-wqy-zenhei
 
 # fake x server
 sudo apt-get install xvfb
+
+# export DJANGO_SETTINGS_MODULE
+export DJANGO_SETTINGS_MODULE="django_project.settings"
