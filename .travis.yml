@@ -12,6 +12,7 @@ before_install:
 
 install:
   - pip install -r requirements.txt
+  - pip install coveralls
 
 before_script:
   - . ./install_chromedriver.sh
@@ -20,7 +21,7 @@ script:
   - cd django_project
   - export PATH=$PATH:$HOME/chromedriver/
   - export DJANGO_SETTINGS_MODULE="django_project.settings"
-  - ./manage.py test --pattern="tests_*.py"
+  - coverage run --source='.' ./manage.py test --pattern="tests_*.py"
 
 after_success:
-  - codecov
+  - coveralls
