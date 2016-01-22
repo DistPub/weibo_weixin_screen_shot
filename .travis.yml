@@ -1,0 +1,25 @@
+language: python
+python: 2.7
+sudo: true
+
+cache:
+  directories:
+  - $HOME/chromedriver
+
+before_install:
+  - sudo apt-get install fonts-wqy-zenhei
+  - sudo apt-get install xvfb
+
+install:
+  - pip install -r requirements.txt
+
+before_script:
+  - . ./install_chromedriver.sh
+
+script:
+  - cd django_project
+  - export DJANGO_SETTINGS_MODULE="django_project.settings"
+  - ./manage.py test --pattern="tests_*.py"
+
+after_success:
+  - codecov
