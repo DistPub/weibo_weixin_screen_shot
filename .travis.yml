@@ -7,7 +7,7 @@ cache:
   - $HOME/chromedriver
 
 before_install:
-  - sudo apt-get install fonts-wqy-zenhei
+  - . ./install_wqy_font.sh
   - sudo apt-get install xvfb
 
 install:
