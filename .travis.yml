@@ -18,6 +18,7 @@ before_script:
 
 script:
   - cd django_project
+  - export PATH=$PATH:$HOME/chromedriver/
   - export DJANGO_SETTINGS_MODULE="django_project.settings"
   - ./manage.py test --pattern="tests_*.py"
 
