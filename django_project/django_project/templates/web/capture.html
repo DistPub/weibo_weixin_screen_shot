@@ -1,1 +1,21 @@
-hello smite
+{% extends "web/base.html" %}
+
+{% load staticfiles %}
+{% load i18n %}
+
+{% block title %}{% trans "Weibo Online Capture" %}{% endblock %}
+{% block container %}
+    <h1>
+        <img src="{% static "web/images/weibo_logo.jpg" %}" align="{% trans "Weibo Logo" %}"/>
+        {% trans "Weibo Online Capture" %}
+    </h1>
+    <div class="form-wrapper">
+        <form action="." method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <div class="btn-submit">
+                <input type="submit" value="{% trans "Submit" %}"/>
+            </div>
+        </form>
+    </div>
+{% endblock %}

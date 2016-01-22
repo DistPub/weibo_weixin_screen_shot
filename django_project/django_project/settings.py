@@ -103,3 +103,11 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
 
 STATIC_URL = '/static/'
+
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'django_project/asserts'),
+]
+
+MEDIA_ROOT = os.path.join(BASE_DIR, 'django_project/media')
+
+DEFAULT_WEIBO_CAPTURE_IMAGE = "common/images/default_weibo_capture.jpg"
