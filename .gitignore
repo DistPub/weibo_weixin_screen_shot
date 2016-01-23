@@ -1,3 +1,2 @@
 *.sqlite3
 *.pyc
-django_project/django_project/media/*
