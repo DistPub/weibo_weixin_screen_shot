@@ -1,3 +1,9 @@
+import base64
+import os
+
+from django.conf import settings
+from django.core.urlresolvers import reverse
+from django.templatetags.static import static
 from pyvirtualdisplay import Display
 from selenium import webdriver
 from selenium.webdriver.support.wait import WebDriverWait
@@ -50,3 +56,16 @@ class WeiboCaptureService(BrowserService):
         self.browser.get(self.url)
         wait.until(EC.visibility_of_element_located((By.CLASS_NAME, self.weibo_page_feature_class)))
         self.browser.save_screenshot(file_path)
+
+    @staticmethod
+    def get_media_relative_path_by(base64_media_path, default=settings.DEFAULT_WEIBO_CAPTURE_IMAGE):
+        """
+        Return media relative path
+        If file not exists, will return default file
+        """
+        user_media_path = base64.b64decode(base64_media_path)
+
+        if os.path.exists(os.path.join(settings.MEDIA_ROOT, user_media_path)):
+            return reverse('media', kwargs={'path': user_media_path})
+        else:
+            return static(default)

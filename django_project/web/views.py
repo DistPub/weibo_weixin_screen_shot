@@ -2,7 +2,6 @@ import base64
 import os
 from django.conf import settings
 from django.core.urlresolvers import reverse
-from django.templatetags.static import static
 from django.views.generic import TemplateView, FormView
 from selenium.common.exceptions import TimeoutException
 
@@ -61,12 +60,5 @@ class WeiboCaptureResultView(TemplateView):
         Return weibo capture image url
         :param base64_media_path: user media file path base64 encrypt string
         """
-        user_media_path = base64.b64decode(base64_media_path)
-        default_file_url = self.request.build_absolute_uri(static(settings.DEFAULT_WEIBO_CAPTURE_IMAGE))
-        if user_media_path == settings.DEFAULT_WEIBO_CAPTURE_IMAGE:
-            return default_file_url
-
-        if not os.path.exists(os.path.join(settings.MEDIA_ROOT, user_media_path)):
-            return default_file_url
-        else:
-            return self.request.build_absolute_uri(reverse('media', kwargs={'path': user_media_path}))
+        relative_url = WeiboCaptureService.get_media_relative_path_by(base64_media_path)
+        return self.request.build_absolute_uri(relative_url)
