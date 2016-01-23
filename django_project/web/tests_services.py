@@ -24,6 +24,5 @@ class WeiboCaptureServiceTest(TestCase):
 
     def test_capture_to_file(self):
         file_path = '/tmp/weibo_capture.png'
-        os.remove(file_path)
         self.service.capture_to_file(file_path)
         self.assertTrue(os.path.exists(file_path))
