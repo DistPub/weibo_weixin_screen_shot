@@ -1,6 +1,6 @@
 . ./export_env.sh
 if [ -z "$PORT" ]; then
-    echo "ERROR: environment variable PORT not exists!"
+    echo "ERROR: environment variable \$PORT not exists!"
     exit 1
 fi
 cd django_project
