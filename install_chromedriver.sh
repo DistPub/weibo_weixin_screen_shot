@@ -8,5 +8,3 @@ if [ ! -d "$HOME/chromedriver" ]; then
 else
     echo 'Using cached chromedriver.';
 fi
-
-export PATH=$PATH:$HOME/chromedriver/
