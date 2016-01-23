@@ -1,5 +1,5 @@
-pyvirtualdisplay==0.1.5
 Pillow==3.1.0
+pyvirtualdisplay==0.1.5
 selenium==2.49.0
-django==1.8.0
 coverage==3.7.1
+django==1.8.0
