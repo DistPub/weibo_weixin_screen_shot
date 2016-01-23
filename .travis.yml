@@ -5,6 +5,7 @@ sudo: true
 cache:
   directories:
   - $HOME/chromedriver
+  - $HOME/.cache/pip
 
 before_install:
   - sudo apt-get install xvfb
