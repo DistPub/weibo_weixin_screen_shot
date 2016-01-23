@@ -1,7 +1,4 @@
-. ./enter_virtualenv.sh
-
-. ./stop_django_runserver.sh
-
 . ./pull_branch.sh
-
+. ./stop_django_runserver.sh
+. ./enter_virtualenv.sh
 . ./start_django_runserver.sh
