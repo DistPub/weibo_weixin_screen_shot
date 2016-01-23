@@ -7,6 +7,11 @@ cache:
   - $HOME/chromedriver
   - $HOME/.cache/pip
 
+env:
+  - PATH=$PATH:$HOME/chromedriver/
+  - DJANGO_SETTINGS_MODULE=django_project.settings
+  - PIP_DOWNLOAD_CACHE=$HOME/.pip-cache
+
 before_install:
   - sudo apt-get install xvfb
 
@@ -19,8 +24,6 @@ before_script:
 
 script:
   - cd django_project
-  - export PATH=$PATH:$HOME/chromedriver/
-  - export DJANGO_SETTINGS_MODULE="django_project.settings"
   - coverage run --source='.' ./manage.py test --pattern="tests_*.py"
 
 after_success:
