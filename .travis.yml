@@ -8,9 +8,7 @@ cache:
   - $HOME/.cache/pip
 
 env:
-  - PATH=$PATH:$HOME/chromedriver/
-  - DJANGO_SETTINGS_MODULE=django_project.settings
-  - PIP_DOWNLOAD_CACHE=$HOME/.pip-cache
+  - PATH=$PATH:$HOME/chromedriver/ DJANGO_SETTINGS_MODULE=django_project.settings PIP_DOWNLOAD_CACHE=$HOME/.pip-cache
 
 before_install:
   - sudo apt-get install xvfb
