@@ -30,6 +30,7 @@ script:
 after_success:
 - coveralls
 - export SSHPASS=$DEPLOY_PASS
+- cd django_project
 - . ./ssh_remote_deploy.sh
 notifications:
   slack:
