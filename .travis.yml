@@ -1,35 +1,33 @@
 language: python
 python: 2.7
 sudo: true
-
 cache:
   directories:
   - $HOME/chromedriver
   - $HOME/.cache/pip
-
 env:
-  - PATH=$PATH:$HOME/chromedriver/ DJANGO_SETTINGS_MODULE=django_project.settings PIP_DOWNLOAD_CACHE=$HOME/.pip-cache
-
+  matrix:
+  - PATH=$PATH:$HOME/chromedriver/ DJANGO_SETTINGS_MODULE=django_project.settings
+    PIP_DOWNLOAD_CACHE=$HOME/.pip-cache
+  global:
+  - secure: GhwFxpmehpL6gx1hCIoD0H3zki60Xhp1eIjuUhxR/EvS/OZnPv94awO2IJ5XmLVjDZMsbt7zUrsMD2JstAhKJlpe8fk3KedcQyPem8C6l2UT+LNSm8Eq8rfbJazuzwsLBs0fGIoBs7ngi674EgCkAHC6LbDuskqjOgiGZLprsayRJDoiTnxAG7VLZ01nRAW+cAuCecD8HwhNY1Vap3FffF48M3SmyCTRuaIyJ3DZK3GtHQlRv1+3/dfPoaFJBZHQRxbKvbm8COLJeywiwyV8fsTRnjPhJV/2ujeVjTdfgifjs0rs+rQGuskbChvn2iW/qetd4qkYtf62771sjsxtEsW09cdK+yH8yy3lMJ9YenVO5ODu31io5dwVrXzGB0a/kWkwInDFUO6xAXB6DIEjCdC5zkhHgXfJ6xMMc9PRZBX6XtSzyasNSJ7s9+OgX3m08uo7AjSzu6xiTZaGTTSpLzabqhgAy33oEtYVSRxQ6dmQfNwCIRuOMaGA8JeH65X4G/CcYXgblovick8xmooGjYoLqTfjyjNnK9WO2sjLcqKSjNgQGqVoHFhDR/RT1rHeaOz/KCOCUX95gPuCfJ1NwhuHrS1ELP7gWE0NS6R9TJ92QBx6xRBU9WcGgTwJkSd0hAu+tRH9M58ARHWgIYR8bGdX4UGVHjzhE+Q+Ko2+UJ0=
+  - secure: CwPr3kQQ68nIQn9jqur8ptWCU1f/ZbneiAlQDh/uvezKScJ/hjABdCRR+999ou0WIbzuqlGCEyYB7X4ylWiguWSNJ8H+NBvQKkDN3cfRKEBuldmE56+RPKxmIbIw2fNYIcShRLxAOP/uw8mmCHDDG2OE4bonWEIjGLlbb6ZZ43WeSsnQ6uOj2EFEx8QexoSBm7JOZaZHA+4PtHjD2d76zaEVeZCi5AMY2hdyZYcEtpVpnam5pyId1WQVoJvH7vTVgCuHZReC0U8ftETpbIp/8hJJ1Vo1iBsEdUGO8sajbK8NLiXiX4gbElnCB33BaRTC/LKyAQdHUrHUQl/RZjJvFiDYlkCqfUNyEReEAuBueogIKjHJjopWMfXVpAFza6JCz2QMRYvSEFFeSjmbpP7SkKON4RhM7JJTQO/UyGtIaR1eaGu9QpXSd/vXMnplaztOpI9Gv91AspBdGSEw4MMj4UcI/0zBkabWD7ALF0c3rarydZBCLWCwojiEO55lu6tnlVyW8hw7fX+KzVtNV7LbIJiaDIdbJGmrLuuV8EqLPV3+2S6Pjl8bv4DmzDGst7+/LhSlvvPYKU5SLryU+IWUBNH3j9tqhcNexTxOHDEXu1rZ4AIT49ECeBOR5yL7BEGVsQkXJ8YHC5hBvraSzTqy06hq9UaOdYH7FkR6x/qOfZQ=
+  - secure: bKMN9mjMzfVu017KW0jIGnGxQ3hEp6w1tP9cr4FRZ+5PrmEtZDeRJwF6uhyQBtbVXSXriGgy9WuNRF78c1exOv9gQGXVGaGji/Bc/2vuAirPy5sz8lqCBKin3lLB67AHJ/OYAi3cRUDrU8Vger/CMjVk+a5K4p1i9kG2xQpErGkJbjaz4pOvMBceKAnasK+3buIe0e4ABTadwbNpNRbofO9xhpVCpueXACRr6ien+xOlRqJKzQHFBvDGLSORHP9SOnklDGa+MhrGz8swdWbyBb5CzK1lQInjUPu+2irtcovT0ni4ohb58bLjKkfHifmFuiEUX7HhUx9KwPs0wYGwEJQmgY9qOwUgHjZUZeznxL4S69qZ2s8nEyyX37K0mINsPzX3kxaZOhWo/4k9U5hwRb7SlOgq4sfphaGJSSJMZzyUGOHyUfkg0wJnfrdEFiJwTfQLFDr+1uKGjdIRAT41qp+9HqOHSFvuxmSiEFF3ikMNCf8yP6qqinBvskCwEVv5rm7GhskomfsrAuxMBqf6B/B1neuvXs2D8FUv1OM+mRtEvdavxy6JMVDgrpDEsGbK/NVmS4kQIcOC63Y/P00gfOl+uIqi8J82b8C1W/DIpKHSag/Hml+eBf3JmobJ+J2rWNnAG6Dxo4UgNcUU+I/51Kxr1tN6tb3QZrXUjgaq4Do=
 before_install:
-  - sudo apt-get install xvfb
-
+- sudo apt-get install xvfb
 install:
-  - pip install -r requirements.txt
-  - pip install coveralls
-
+- pip install -r requirements.txt
+- pip install coveralls
 before_script:
-  - . ./install_chromedriver.sh
-
+- . ./install_chromedriver.sh
 script:
-  - cd django_project
-  - coverage run --source='.' ./manage.py test --pattern="tests_*.py"
-
+- cd django_project
+- coverage run --source='.' ./manage.py test --pattern="tests_*.py"
 after_success:
-  - coveralls
-
+- coveralls
 notifications:
   slack:
     rooms:
-      - distpub:aAjNXvrngKDUU7EFeNQnkpei
+    - distpub:aAjNXvrngKDUU7EFeNQnkpei
     on_success: change
     on_failure: always
