@@ -12,10 +12,28 @@
     <title>{% block title %}{% endblock %}</title>
     <meta name="description" content="">
     <meta name="keywords" content="">
+
+    {% block css %}
+        <script type="text/javascript">window.less = window.less || {env: "development"};</script>
+        <link href="{% static "common/libs/bootstrap3/less/bootstrap.less" %}" rel="stylesheet" type="text/less"/>
+
+        {% block page-css %}
+        {% endblock %}
+
+        <script src="{% static "common/libs/less_js/less.min.js" %}" type="text/javascript"></script>
+    {% endblock %}
 </head>
-<body>
+<body id="{% block body_id %}{% endblock %}">
     <div class="container">
         {% block container %}{% endblock %}
     </div>
+
+    {% block js %}
+        <script src="{% static "common/libs/jquery2/jquery-2.2.0.min.js" %}" type="text/javascript"></script>
+        <script src="{% static "common/libs/bootstrap3/js/bootstrap.min.js" %}" type="text/javascript"></script>
+
+        {% block page-js %}
+        {% endblock %}
+    {% endblock js %}
 </body>
 </html>
