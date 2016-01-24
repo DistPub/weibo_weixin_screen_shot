@@ -2,8 +2,26 @@
 
 {% load staticfiles %}
 {% load i18n %}
+{% load bootstrap3 %}
 
 {% block title %}{% trans "Weibo Online Capture Result" %}{% endblock %}
+{% block page-css %}
+    <link href="{% static "web/less/page_weibo_capture_result.less" %}" rel="stylesheet" type="text/less"/>
+{% endblock %}
+{% block body_id %}weibo-capture-result{% endblock %}
 {% block container %}
-    <img src="{{ image_url }}"/>
+    {% include "web/includes/include_capture_header.html" %}
+    <div class="row result-wrapper">
+        <div class="col-xs-8 image-preview">
+            <img src="{{ image_url }}"/>
+        </div>
+        <div class="col-xs-4 actions-wrapper">
+            <ul>
+                <li><a href="{{ image_url }}" download>
+                    <button class="btn btn-success">{% bootstrap_icon "download-alt" %} {% trans "Download" %}</button></a></li>
+                <li><a href="{% url "web:weibo-capture" %}">
+                    <button class="btn btn-default">{% bootstrap_icon "arrow-left" %} {% trans "Return" %}</button></a></li>
+            </ul>
+        </div>
+    </div>
 {% endblock %}

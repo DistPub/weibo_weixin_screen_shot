@@ -1,0 +1,13 @@
+engines:
+  duplication:
+    enabled: true
+    config:
+      languages:
+      - python
+      - javascript
+ratings:
+  paths:
+  - "**.py"
+  - "**.js"
+exclude_paths:
+- django_project/django_project/asserts/common/libs/**/*
