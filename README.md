@@ -12,7 +12,7 @@ A screen shot tool of weibo and weixin page.
 Master branch is our [production](http://tools.dist.pub/)'s code base.
 
 # Meta Info
-![LICENCE](https://img.shields.io/badge/LICENCE-MIT-brightgreen.svg?style=flat-square)
-![LOVE](https://img.shields.io/badge/Code%20with-%E2%9D%A4-brightgreen.svg?style=flat-square)
-![Author](https://img.shields.io/badge/Author-Smite%20Chow-brightgreen.svg?style=flat-square)
-![Thanks](https://img.shields.io/badge/Thanks-Yuer-brightgreen.svg?style=flat-square)
+[![LICENCE](https://img.shields.io/badge/LICENCE-MIT-brightgreen.svg?style=flat-square)](http://badges.mit-license.org/)
+[![LOVE](https://img.shields.io/badge/Code%20with-%E2%9D%A4-brightgreen.svg?style=flat-square)](http://resume.smitechow.com)
+[![Author](https://img.shields.io/badge/Author-Smite%20Chow-brightgreen.svg?style=flat-square)](mailto:xiaopengyou2no1@gmail.com)
+[![Thanks](https://img.shields.io/badge/Thanks-Yuer-brightgreen.svg?style=flat-square)](#)
