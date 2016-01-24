@@ -1,5 +1,6 @@
 {% load staticfiles %}
 {% load i18n %}
+{% load bootstrap3 %}
 
 <!DOCTYPE html>
 <html lang="en">
@@ -17,6 +18,7 @@
         <script type="text/javascript">window.less = window.less || {env: "development"};</script>
         <link href="{% static "common/libs/bootstrap3/css/bootstrap.min.css" %}" rel="stylesheet" type="text/css"/>
         <link href="{% static "common/libs/bootstrap3/css/bootstrap-theme.min.css" %}" rel="stylesheet" type="text/css"/>
+        <link href="{% static "web/less/base.less" %}" rel="stylesheet" type="text/less"/>
 
         {% block page-css %}
         {% endblock %}
@@ -25,9 +27,10 @@
     {% endblock %}
 </head>
 <body id="{% block body_id %}{% endblock %}">
-    <div class="container">
+    <div class="container footer-push">
         {% block container %}{% endblock %}
     </div>
+    <footer>© 2016 SmiteChow, Code with {% bootstrap_icon "heart" %}</footer>
 
     {% block js %}
         <script src="{% static "common/libs/jquery2/jquery-2.2.0.min.js" %}" type="text/javascript"></script>
