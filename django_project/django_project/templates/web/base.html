@@ -15,7 +15,8 @@
 
     {% block css %}
         <script type="text/javascript">window.less = window.less || {env: "development"};</script>
-        <link href="{% static "common/libs/bootstrap3/less/bootstrap.less" %}" rel="stylesheet" type="text/less"/>
+        <link href="{% static "common/libs/bootstrap3/css/bootstrap.min.css" %}" rel="stylesheet" type="text/css"/>
+        <link href="{% static "common/libs/bootstrap3/css/bootstrap-theme.min.css" %}" rel="stylesheet" type="text/css"/>
 
         {% block page-css %}
         {% endblock %}
