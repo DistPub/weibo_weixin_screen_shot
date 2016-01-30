@@ -192,7 +192,7 @@ class WeiboCaptureService(BrowserService):
             raise WeiboNotLoginException()
 
         self.get(self.url)
-        self.find_element(self.document_detail_page_comment_class)
+        self.find_element_visible_and_clickable(self.document_detail_page_comment_class)
         self.browser.save_screenshot(file_path)
 
     @staticmethod
