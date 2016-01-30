@@ -18,6 +18,8 @@ addons:
   apt:
     packages:
     - sshpass
+services:
+  - redis-server
 before_install:
 - sudo apt-get -y install xvfb
 install:

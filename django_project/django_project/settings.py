@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/1.8/ref/settings/
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
+import sys
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -112,3 +113,56 @@ STATICFILES_DIRS = [
 MEDIA_ROOT = os.path.join(BASE_DIR, 'django_project/media')
 
 DEFAULT_WEIBO_CAPTURE_IMAGE = "common/images/default_weibo_capture.jpg"
+
+SINA_WEIBO_USERNAME = 'xiaopengyou@live.com'
+SINA_WEIBO_PASSWORD = 'weibo2b'
+SINA_WEIBO_LOGIN_REDIRECT_PAGE = 'http://weibo.com/lovemyliwu/home'
+
+CHROME_USER_DATA_DIR_POOL_SIZE = 3
+CHROME_USER_DATA_DIR_POOL = []
+CHROME_RESOURCE_LOCKS = []
+for idx in xrange(CHROME_USER_DATA_DIR_POOL_SIZE):
+    CHROME_USER_DATA_DIR_POOL.append(os.path.join(BASE_DIR, 'django_project/chrome_data/user' + str(idx + 1)))
+    CHROME_RESOURCE_LOCKS.append('CHROME_LOCK' + str(idx + 1))
+CHROME_HOME_PAGE = 'chrome://newtab'
+CHROME_RESOURCE_LOCK_TIME = 60 * 60
+
+CACHES = {
+    'default': {
+        'BACKEND': 'redis_lock.django_cache.RedisCache',
+        'LOCATION': '127.0.0.1:6379',
+        'OPTIONS': {
+            'DB': 1
+        }
+    }
+}
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': "[%(asctime)s|%(name)s|%(levelname)s] %(message)s",
+            'datefmt': "%Y-%m-%d %H:%M:%S"
+        },
+    },
+    'filters': {
+        'require_debug_false': {
+            '()': 'django.utils.log.RequireDebugFalse'
+        }
+    },
+    'handlers': {
+    },
+    'loggers': {
+    }
+}
+
+JQUERY_JS_FILE = os.path.join(BASE_DIR, 'django_project/asserts/common/libs/jquery2/jquery-2.2.0.min.js')
+
+# redirect all log to console
+import logging
+stream_handler = logging.StreamHandler()
+stream_handler.setFormatter(logging.Formatter('[%(asctime)s|%(name)s|%(levelname)s] %(message)s', "%Y-%m-%d %H:%M:%S"))
+root_logger = logging.getLogger()
+root_logger.setLevel(os.environ.get('LOGGER_LEVEL', logging.DEBUG if DEBUG else logging.ERROR))
+root_logger.addHandler(stream_handler)

@@ -1,14 +1,17 @@
 import base64
 import os
+import logging
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.views.generic import TemplateView, FormView
 from selenium.common.exceptions import TimeoutException
 
 from django_project import utils
-
+from web.exceptions import WeiboNotLoginException
 from web.forms import WeiboCaptureRequestForm
 from web.services import WeiboCaptureService
+
+logger = logging.getLogger()
 
 
 class WeiboCaptureView(FormView):
@@ -23,13 +26,17 @@ class WeiboCaptureView(FormView):
         When form valid, save it to view
         """
         url = form.cleaned_data['url']
-        service = WeiboCaptureService(url)
+        service = WeiboCaptureService(url, auto_login=True)
         self.user_media_path = utils.generate_user_media_image_path(name='capture', prefix='weibo')
         file_path = os.path.join(settings.MEDIA_ROOT, self.user_media_path)
         try:
             service.capture_to_file(file_path)
         except TimeoutException:
+            logger.warning('WeiboCaptureView.form_valid get TimeoutException')
             os.remove(file_path)
+            self.user_media_path = settings.DEFAULT_WEIBO_CAPTURE_IMAGE
+        except WeiboNotLoginException:
+            logger.error('WeiboCaptureView.form_valid get WeiboNotLoginException')
             self.user_media_path = settings.DEFAULT_WEIBO_CAPTURE_IMAGE
         return super(WeiboCaptureView, self).form_valid(form)
 
