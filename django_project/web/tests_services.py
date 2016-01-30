@@ -150,10 +150,11 @@ class WeiboCaptureServiceTest(TestCase):
         self.service.login_success = True
         self.service.get = mock.Mock()
         self.service.browser = mock.Mock()
-        self.service.find_element = mock.Mock()
+        self.service.find_element_visible_and_clickable = mock.Mock()
         self.service.capture_to_file(file_path)
         self.service.get.assert_called_once_with(self.service.url)
-        self.service.find_element.assert_called_once_with(self.service.document_detail_page_comment_class)
+        self.service.find_element_visible_and_clickable.assert_called_once_with(
+            self.service.document_detail_page_comment_class)
         self.service.browser.save_screenshot.assert_called_once_with(file_path)
 
     def test_capture_to_file_not_login_raise_exception(self, *args):
