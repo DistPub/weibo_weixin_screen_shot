@@ -18,6 +18,8 @@ addons:
   apt:
     packages:
     - sshpass
+services:
+  - redis-server
 before_install:
 - sudo apt-get -y install xvfb
 install:
@@ -27,6 +29,7 @@ before_script:
 - . ./install_chromedriver.sh
 script:
 - cd django_project
+- export LOGGER_LEVEL=ERROR
 - coverage run --source='.' ./manage.py test --pattern="tests_*.py"
 after_success:
 - coveralls
