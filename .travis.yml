@@ -29,6 +29,7 @@ before_script:
 - . ./install_chromedriver.sh
 script:
 - cd django_project
+- export LOGGER_LEVEL=ERROR
 - coverage run --source='.' ./manage.py test --pattern="tests_*.py"
 after_success:
 - coveralls
