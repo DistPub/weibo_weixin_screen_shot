@@ -1,4 +1,6 @@
 import base64
+from time import sleep
+
 import os
 import logging
 
@@ -11,7 +13,7 @@ from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 
-from django_project.utils import get_chrome_resource
+from django_project import utils
 from web.exceptions import WeiboNotLoginException
 
 logger = logging.getLogger()
@@ -29,7 +31,7 @@ class BrowserService(object):
         display.start()
         self.screen = display
 
-        self.browser_lock, self.browser_user_path = get_chrome_resource()
+        self.browser_lock, self.browser_user_path = utils.get_chrome_resource()
         logger.info('BrowserService.__init__ lock:%s, path:%s' % (self.browser_lock, self.browser_user_path))
         chrome_options = webdriver.ChromeOptions()
         chrome_options.add_argument('user-data-dir=' + self.browser_user_path)
@@ -159,16 +161,28 @@ class WeiboCaptureService(BrowserService):
         account_login_type_selector = 'a[node-type="normal_tab"]'
 
         self.get(self.login_page_url)
+
+        # make form visible
         username_input = self.find_element(username_selector)
         if not username_input.is_displayed():
             self.find_element_visible_and_clickable(account_login_type_selector).click()
+        self.find_element_visible_and_clickable(username_selector)
+
         self.fill_input(username_input, settings.SINA_WEIBO_USERNAME)
         self.fill_input(self.find_element(password_selector), settings.SINA_WEIBO_PASSWORD)
         self.select_checkbox(self.find_element(remember_password_selector))
         self.find_element_visible_and_clickable(submit_selecotr).click()
 
+        # wait for iframe do login complete
+        # TODO: need make a better way to check login response returned
+        sleep(3)
+
         if self.browser.current_url.startswith(settings.SINA_WEIBO_LOGIN_REDIRECT_PAGE):
             self.login_success = True
+        else:
+            file_path = utils.generate_user_media_image_path(prefix='error')
+            self.browser.save_screenshot(file_path)
+            logger.error('WeiboCaptureService.do_login failed, please check screen shot file:' + file_path)
 
     def capture_to_file(self, file_path):
         """

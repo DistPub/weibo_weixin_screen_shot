@@ -10,6 +10,7 @@ from django_redis import get_redis_connection
 
 from web.exceptions import WeiboNotLoginException
 from web.services import WeiboCaptureService, BrowserService
+from django_project import utils
 
 
 @mock.patch('selenium.webdriver.Chrome')
@@ -129,6 +130,20 @@ class WeiboCaptureServiceTest(TestCase):
         self.service.browser = mock.Mock(current_url=settings.SINA_WEIBO_LOGIN_REDIRECT_PAGE)
         self.service.do_login()
         self.assertTrue(self.service.login_success)
+
+    @mock.patch.object(WeiboCaptureService, 'get')
+    @mock.patch.object(WeiboCaptureService, 'find_element_visible_and_clickable')
+    @mock.patch.object(WeiboCaptureService, 'select_checkbox')
+    @mock.patch.object(WeiboCaptureService, 'fill_input')
+    @mock.patch.object(WeiboCaptureService, 'find_element',
+                       return_value=mock.Mock(is_displayed=mock.Mock(return_value=False)))
+    @mock.patch.object(utils, 'generate_user_media_image_path')
+    def test_do_login_failed(self, mock_method, *args):
+        mock_method.return_value = 'a_path'
+        self.service.browser = mock.Mock(current_url='abc')
+        self.service.do_login()
+        self.service.browser.save_screenshot.assert_called_once_with('a_path')
+        self.assertFalse(self.service.login_success)
 
     def test_capture_to_file_when_login_success(self, *args):
         file_path = '/tmp/weibo_capture.png'
