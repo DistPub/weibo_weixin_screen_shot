@@ -1,9 +1,9 @@
 import random
-
 import os
 import time
 
 from django.conf import settings
+from django.core.cache import cache
 
 
 def generate_user_media_image_path(name=None, prefix=None, suffix='png'):
@@ -34,3 +34,22 @@ def generate_user_media_image_path(name=None, prefix=None, suffix='png'):
         if not os.path.exists(file_path):
             open(file_path, 'w').close()
             return tmp_name
+
+def get_chrome_resource():
+    """
+    Return chrome resource lock and user data path
+    If no resource just return a temp path
+    """
+    for idx, lock_name in enumerate(settings.CHROME_RESOURCE_LOCKS):
+        lock = cache.lock(lock_name, expire=settings.CHROME_RESOURCE_LOCK_TIME)
+        if lock.acquire(blocking=False):
+            return lock, settings.CHROME_USER_DATA_DIR_POOL[idx]
+
+    while True:
+        tmp_name = 'chrome_user_data_' + str(random.randint(0, 999999)) + str(int(time.time()))
+        tmp_path = os.path.join('/tmp/', tmp_name)
+        if os.path.exists(tmp_path):
+            continue
+
+        os.mkdir(tmp_path)
+        return None, tmp_path
