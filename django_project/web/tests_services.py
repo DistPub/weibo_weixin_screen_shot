@@ -53,17 +53,17 @@ class BrowserServiceTest(TestCase):
         self.service.browser.get.assert_called_once_with('abc')
         self.service.browser.execute_script.assert_called_once_with(self.service.jquery)
 
-    @mock.patch.object(EC, 'presence_of_element_located', return_value=mock.Mock(return_value='element'))
+    @mock.patch.object(EC, 'presence_of_element_located', return_value=mock.Mock(return_value='element1'))
     def test_find_element(self, mock_method, *args):
-        self.assertEqual('element', self.service.find_element('abc'))
+        self.assertEqual('element1', self.service.find_element('abc'))
 
-    @mock.patch.object(EC, 'element_to_be_clickable', return_value=mock.Mock(return_value='element'))
+    @mock.patch.object(EC, 'element_to_be_clickable', return_value=mock.Mock(return_value='element2'))
     def test_find_element_visible_and_clickable(self, mock_method, *args):
-        self.assertEqual('element', self.service.find_element_visible_and_clickable('abc'))
+        self.assertEqual('element2', self.service.find_element_visible_and_clickable('abc'))
 
-    @mock.patch.object(EC, 'presence_of_all_elements_located', return_value=mock.Mock(return_value='element'))
+    @mock.patch.object(EC, 'presence_of_all_elements_located', return_value=mock.Mock(return_value='element3'))
     def test_find_elements(self, mock_method, *args):
-        self.assertEqual('element', self.service.find_elements('abc'))
+        self.assertEqual('element3', self.service.find_elements('abc'))
 
     def test_fill_input(self, *args):
         mock_element = mock.Mock()

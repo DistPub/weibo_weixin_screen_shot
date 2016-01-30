@@ -51,7 +51,7 @@ class BrowserService(object):
         try:
             self.screen.stop()
         except Exception as e:
-            logger.warning('BrowserService.__del__ exception:' + str(e))
+            logger.warning('BrowserService.__del__ stop screen exception:' + str(e))
 
         try:
             if self.browser_lock:
@@ -59,12 +59,12 @@ class BrowserService(object):
             else:
                 os.remove(self.browser_user_path)
         except Exception as e:
-            logger.warning('BrowserService.__del__ exception:' + str(e))
+            logger.warning('BrowserService.__del__ release lock or remove tmp folder exception:' + str(e))
 
         try:
             self.browser.quit()
         except Exception as e:
-            logger.warning('BrowserService.__del__ exception:' + str(e))
+            logger.warning('BrowserService.__del__ quit browser exception:' + str(e))
 
     def get(self, url):
         """
