@@ -2,6 +2,7 @@ import random
 import os
 import time
 
+from PIL import Image
 from django.conf import settings
 from django.core.cache import cache
 
@@ -53,3 +54,19 @@ def get_chrome_resource():
 
         os.mkdir(tmp_path)
         return None, tmp_path
+
+def crop_image(file_path, start_x_pos, start_y_pos, width, height):
+    """
+    Crop image to specified size
+    """
+    bounding_box = (
+        start_x_pos,
+        start_y_pos,
+        start_x_pos + width,
+        start_y_pos + height
+    )
+    base_image = Image.open(file_path)
+    cropped_image = base_image.crop(bounding_box)
+    base_image = base_image.resize(cropped_image.size)
+    base_image.paste(cropped_image)
+    base_image.save(file_path)

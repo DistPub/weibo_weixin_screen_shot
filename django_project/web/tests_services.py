@@ -160,6 +160,20 @@ class WeiboCaptureServiceTest(TestCase):
     def test_capture_to_file_not_login_raise_exception(self, *args):
         self.assertRaises(WeiboNotLoginException, self.service.capture_to_file, 'abc')
 
+    @mock.patch.object(utils, 'crop_image')
+    def test_capture_document_info_to_file(self, mock_crop_image, *args):
+        file_path = '/tmp/weibo_capture.png'
+        self.service.login_success = True
+        self.service._fetch_url = mock.Mock()
+        self.service.find_element_visible_and_clickable = mock.Mock()
+        self.service.find_element = mock.Mock(return_value=mock.Mock(
+            location={'x':1, 'y':2},
+            size={'width':3, 'height':4}
+        ))
+        self.service.execute_script = mock.Mock()
+        self.service.capture_document_info_to_file(file_path)
+        mock_crop_image.assert_called_once_with(file_path, 1, 0, 3, 6)
+
     def test_get_relative_url_by_base64_media_path(self, *args):
         tmp_name = '.gitignore'
         base64_media_path = base64.b64encode(tmp_name)

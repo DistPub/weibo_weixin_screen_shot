@@ -108,11 +108,11 @@ class BrowserService(object):
         if (value and not web_element.is_selected()) or (not value and web_element.is_selected()):
             web_element.click()
 
-    def execute_script(self, script):
+    def execute_script(self, script, *args):
         """
         Shortcut to execute script
         """
-        return self.browser.execute_script(script)
+        return self.browser.execute_script(script, *args)
 
 
 class WeiboCaptureService(BrowserService):
@@ -184,16 +184,44 @@ class WeiboCaptureService(BrowserService):
             self.browser.save_screenshot(file_path)
             logger.error('WeiboCaptureService.do_login failed, please check screen shot file:' + file_path)
 
-    def capture_to_file(self, file_path):
+    def _fetch_url(self):
         """
-        Capture weibo url specified page to a file
+        If weibo login success then fetch url
         """
         if not self.login_success:
             raise WeiboNotLoginException()
 
         self.get(self.url)
+
+    def capture_to_file(self, file_path):
+        """
+        Capture weibo url specified page to a file
+        """
+        self._fetch_url()
         self.find_element_visible_and_clickable(self.document_detail_page_comment_class)
         self.browser.save_screenshot(file_path)
+
+    def capture_document_info_to_file(self, file_path):
+        """
+        Capture document info, include author info and document info
+        """
+        self._fetch_url()
+        self.find_element_visible_and_clickable(self.document_detail_page_comment_class)
+
+        top_banner_selector = '#pl_common_top'
+        self.execute_script('arguments[0].remove();', self.find_element(top_banner_selector))
+
+        document_info_selector = '#plc_main'
+        self.execute_script('return arguments[0].scrollIntoView();', self.find_element(document_info_selector))
+
+        document_handle_selector = '.WB_feed_handle'
+        handler = self.find_element(document_handle_selector)
+        handler_location = handler.location
+        handler_size = handler.size
+
+        self.browser.save_screenshot(file_path)
+        utils.crop_image(file_path, handler_location['x'], 0, handler_size['width'],
+                         handler_location['y'] + handler_size['height'])
 
     @staticmethod
     def get_media_relative_path_by(base64_media_path, default=settings.DEFAULT_WEIBO_CAPTURE_IMAGE):
