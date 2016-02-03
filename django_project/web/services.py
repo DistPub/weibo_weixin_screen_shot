@@ -4,11 +4,13 @@ from time import sleep
 import os
 import logging
 
+from PIL import Image
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.templatetags.static import static
 from pyvirtualdisplay import Display
 from selenium import webdriver
+from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
@@ -23,11 +25,14 @@ class BrowserService(object):
     """
     Browser Service
     """
+    DISPLAY_WIDTH = 1920
+    DISPLAY_HEIGHT = 1200
+
     def __init__(self):
         """
         Init BaseBrowserService
         """
-        display = Display(visible=0, size=(1920, 1200))
+        display = Display(visible=0, size=(self.DISPLAY_WIDTH, self.DISPLAY_HEIGHT))
         display.start()
         self.screen = display
 
@@ -41,7 +46,7 @@ class BrowserService(object):
         except Exception as e:
             logger.error('BrowserService.__init__ driver error:' + str(e))
             driver = webdriver.Chrome()
-        driver.set_window_size(1920, 1200)
+        driver.set_window_size(self.DISPLAY_WIDTH, self.DISPLAY_HEIGHT)
         self.browser = driver
         self.wait = WebDriverWait(self.browser, 60)
         self.jquery = open(settings.JQUERY_JS_FILE).read()
@@ -113,6 +118,15 @@ class BrowserService(object):
         Shortcut to execute script
         """
         return self.browser.execute_script(script, *args)
+
+    def screen_shot(self, file_path):
+        """
+        Screen shot page then resize to window width
+        """
+        self.browser.save_screenshot(file_path)
+        base_image = Image.open(file_path)
+        base_image = base_image.resize((self.DISPLAY_WIDTH, base_image.height))
+        base_image.save(file_path)
 
 
 class WeiboCaptureService(BrowserService):
@@ -199,7 +213,7 @@ class WeiboCaptureService(BrowserService):
         """
         self._fetch_url()
         self.find_element_visible_and_clickable(self.document_detail_page_comment_class)
-        self.browser.save_screenshot(file_path)
+        self.screen_shot(file_path)
 
     def capture_document_info_to_file(self, file_path):
         """
@@ -207,21 +221,29 @@ class WeiboCaptureService(BrowserService):
         """
         self._fetch_url()
         self.find_element_visible_and_clickable(self.document_detail_page_comment_class)
+        self.find_element('.WB_text')
+
+        try:
+            self.browser.find_element_by_css_selector('.WB_expand_media_box')
+            self.find_element_visible_and_clickable('a[action-type="feed_list_media_toSmall"]').click()
+        except NoSuchElementException:
+            pass
 
         top_banner_selector = '#pl_common_top'
         self.execute_script('arguments[0].remove();', self.find_element(top_banner_selector))
 
         document_info_selector = '#plc_main'
-        self.execute_script('return arguments[0].scrollIntoView();', self.find_element(document_info_selector))
+        info = self.find_element(document_info_selector)
+        info_location = info.location
 
+        self.screen_shot(file_path)
         document_handle_selector = '.WB_feed_handle'
         handler = self.find_element(document_handle_selector)
         handler_location = handler.location
         handler_size = handler.size
 
-        self.browser.save_screenshot(file_path)
-        utils.crop_image(file_path, handler_location['x'], 0, handler_size['width'],
-                         handler_location['y'] + handler_size['height'])
+        utils.crop_image(file_path, info_location['x'] - 3, info_location['y'] - 3, handler_size['width'] + 9,
+                         handler_location['y'] + handler_size['height'] - info_location['y'] + 9)
 
     @staticmethod
     def get_media_relative_path_by(base64_media_path, default=settings.DEFAULT_WEIBO_CAPTURE_IMAGE):
