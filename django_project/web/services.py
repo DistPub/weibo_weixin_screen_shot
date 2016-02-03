@@ -180,7 +180,7 @@ class WeiboCaptureService(BrowserService):
         if self.browser.current_url.startswith(settings.SINA_WEIBO_LOGIN_REDIRECT_PAGE):
             self.login_success = True
         else:
-            file_path = utils.generate_user_media_image_path(prefix='error')
+            file_path = os.path.join(settings.MEDIA_ROOT, utils.generate_user_media_image_path(prefix='error'))
             self.browser.save_screenshot(file_path)
             logger.error('WeiboCaptureService.do_login failed, please check screen shot file:' + file_path)
 

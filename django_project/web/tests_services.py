@@ -1,5 +1,6 @@
 import base64
 import mock
+import os
 import redis_lock
 from selenium.webdriver.support import expected_conditions as EC
 
@@ -140,9 +141,10 @@ class WeiboCaptureServiceTest(TestCase):
     @mock.patch.object(utils, 'generate_user_media_image_path')
     def test_do_login_failed(self, mock_method, *args):
         mock_method.return_value = 'a_path'
+        file_path = os.path.join(settings.MEDIA_ROOT, 'a_path')
         self.service.browser = mock.Mock(current_url='abc')
         self.service.do_login()
-        self.service.browser.save_screenshot.assert_called_once_with('a_path')
+        self.service.browser.save_screenshot.assert_called_once_with(file_path)
         self.assertFalse(self.service.login_success)
 
     def test_capture_to_file_when_login_success(self, *args):
