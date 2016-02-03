@@ -60,10 +60,10 @@ def crop_image(file_path, start_x_pos, start_y_pos, width, height):
     Crop image to specified size
     """
     bounding_box = (
-        start_x_pos,
-        start_y_pos,
-        start_x_pos + width,
-        start_y_pos + height
+        int(start_x_pos),
+        int(start_y_pos),
+        int(start_x_pos + width),
+        int(start_y_pos + height)
     )
     base_image = Image.open(file_path)
     cropped_image = base_image.crop(bounding_box)
