@@ -2,6 +2,8 @@ import base64
 import mock
 import os
 import redis_lock
+from PIL import Image
+from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.support import expected_conditions as EC
 
 from django.conf import settings
@@ -147,34 +149,35 @@ class WeiboCaptureServiceTest(TestCase):
         self.service.browser.save_screenshot.assert_called_once_with(file_path)
         self.assertFalse(self.service.login_success)
 
-    def test_capture_to_file_when_login_success(self, *args):
+    @mock.patch.object(Image, 'open')
+    def test_capture_to_file_when_login_success(self, mock_open, *args):
         file_path = '/tmp/weibo_capture.png'
         self.service.login_success = True
         self.service.get = mock.Mock()
         self.service.browser = mock.Mock()
+        self.service.browser.find_element_by_css_selector.side_effect = NoSuchElementException()
         self.service.find_element_visible_and_clickable = mock.Mock()
         self.service.capture_to_file(file_path)
         self.service.get.assert_called_once_with(self.service.url)
-        self.service.find_element_visible_and_clickable.assert_called_once_with(
-            self.service.document_detail_page_comment_class)
         self.service.browser.save_screenshot.assert_called_once_with(file_path)
 
     def test_capture_to_file_not_login_raise_exception(self, *args):
         self.assertRaises(WeiboNotLoginException, self.service.capture_to_file, 'abc')
 
+    @mock.patch.object(Image, 'open')
     @mock.patch.object(utils, 'crop_image')
-    def test_capture_document_info_to_file(self, mock_crop_image, *args):
+    def test_capture_document_info_to_file(self, mock_crop_image, mock_open, *args):
         file_path = '/tmp/weibo_capture.png'
         self.service.login_success = True
         self.service._fetch_url = mock.Mock()
         self.service.find_element_visible_and_clickable = mock.Mock()
         self.service.find_element = mock.Mock(return_value=mock.Mock(
-            location={'x':1, 'y':2},
+            location={'x':4, 'y':5},
             size={'width':3, 'height':4}
         ))
         self.service.execute_script = mock.Mock()
-        self.service.capture_document_info_to_file(file_path)
-        mock_crop_image.assert_called_once_with(file_path, 1, 0, 3, 6)
+        self.service.capture_feed_to_file(file_path)
+        mock_crop_image.assert_called_once_with(file_path, 1, 2, 9, 10)
 
     def test_get_relative_url_by_base64_media_path(self, *args):
         tmp_name = '.gitignore'

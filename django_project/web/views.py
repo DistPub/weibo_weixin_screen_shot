@@ -32,7 +32,7 @@ class WeiboCaptureView(FormView):
         file_path = os.path.join(settings.MEDIA_ROOT, self.user_media_path)
         try:
             if crop_feed:
-                service.capture_document_info_to_file(file_path)
+                service.capture_feed_to_file(file_path)
             else:
                 service.capture_to_file(file_path)
         except TimeoutException:

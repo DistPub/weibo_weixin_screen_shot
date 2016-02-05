@@ -133,7 +133,6 @@ class WeiboCaptureService(BrowserService):
     """
     Weibo capture sevice
     """
-    document_detail_page_comment_class = 'span[node-type="comment_btn_text"]'
     login_success_feature_url = 'http://account.weibo.com/set/index'
     login_page_url = 'http://weibo.com/login.php'
 
@@ -207,20 +206,11 @@ class WeiboCaptureService(BrowserService):
 
         self.get(self.url)
 
-    def capture_to_file(self, file_path):
+    def _wait_feed_load_complete(self):
         """
-        Capture weibo url specified page to a file
+        Wait feed load complete
         """
-        self._fetch_url()
-        self.find_element_visible_and_clickable(self.document_detail_page_comment_class)
-        self.screen_shot(file_path)
-
-    def capture_document_info_to_file(self, file_path):
-        """
-        Capture document info, include author info and document info
-        """
-        self._fetch_url()
-        self.find_element_visible_and_clickable(self.document_detail_page_comment_class)
+        self.find_element_visible_and_clickable('span[node-type="comment_btn_text"]')
         self.find_element('.WB_text')
 
         try:
@@ -229,21 +219,35 @@ class WeiboCaptureService(BrowserService):
         except NoSuchElementException:
             pass
 
-        top_banner_selector = '#pl_common_top'
-        self.execute_script('arguments[0].remove();', self.find_element(top_banner_selector))
+    def capture_to_file(self, file_path):
+        """
+        Capture weibo url specified page to a file
+        """
+        self._fetch_url()
+        self._wait_feed_load_complete()
+        self.screen_shot(file_path)
+
+    def capture_feed_to_file(self, file_path):
+        """
+        Capture document info, include author info and document info
+        """
+        self._fetch_url()
+        self._wait_feed_load_complete()
 
         document_info_selector = '#plc_main'
-        info = self.find_element(document_info_selector)
-        info_location = info.location
+        info_location = self.find_element(document_info_selector).location
 
-        self.screen_shot(file_path)
         document_handle_selector = '.WB_feed_handle'
         handler = self.find_element(document_handle_selector)
         handler_location = handler.location
         handler_size = handler.size
 
-        utils.crop_image(file_path, info_location['x'] - 3, info_location['y'] - 3, handler_size['width'] + 9,
-                         handler_location['y'] + handler_size['height'] - info_location['y'] + 9)
+        self.screen_shot(file_path)
+        utils.crop_image(file_path,
+                         info_location['x'] - 3,
+                         info_location['y'] - 3,
+                         handler_size['width'] + 6,
+                         handler_location['y'] + handler_size['height'] - info_location['y'] + 6)
 
     @staticmethod
     def get_media_relative_path_by(base64_media_path, default=settings.DEFAULT_WEIBO_CAPTURE_IMAGE):
