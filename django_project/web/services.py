@@ -4,11 +4,13 @@ from time import sleep
 import os
 import logging
 
+from PIL import Image
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.templatetags.static import static
 from pyvirtualdisplay import Display
 from selenium import webdriver
+from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
@@ -23,11 +25,14 @@ class BrowserService(object):
     """
     Browser Service
     """
+    DISPLAY_WIDTH = 1920
+    DISPLAY_HEIGHT = 1200
+
     def __init__(self):
         """
         Init BaseBrowserService
         """
-        display = Display(visible=0, size=(1920, 1200))
+        display = Display(visible=0, size=(self.DISPLAY_WIDTH, self.DISPLAY_HEIGHT))
         display.start()
         self.screen = display
 
@@ -41,7 +46,7 @@ class BrowserService(object):
         except Exception as e:
             logger.error('BrowserService.__init__ driver error:' + str(e))
             driver = webdriver.Chrome()
-        driver.set_window_size(1920, 1200)
+        driver.set_window_size(self.DISPLAY_WIDTH, self.DISPLAY_HEIGHT)
         self.browser = driver
         self.wait = WebDriverWait(self.browser, 60)
         self.jquery = open(settings.JQUERY_JS_FILE).read()
@@ -108,18 +113,26 @@ class BrowserService(object):
         if (value and not web_element.is_selected()) or (not value and web_element.is_selected()):
             web_element.click()
 
-    def execute_script(self, script):
+    def execute_script(self, script, *args):
         """
         Shortcut to execute script
         """
-        return self.browser.execute_script(script)
+        return self.browser.execute_script(script, *args)
+
+    def screen_shot(self, file_path):
+        """
+        Screen shot page then resize to window width
+        """
+        self.browser.save_screenshot(file_path)
+        base_image = Image.open(file_path)
+        base_image = base_image.resize((self.DISPLAY_WIDTH, base_image.height))
+        base_image.save(file_path)
 
 
 class WeiboCaptureService(BrowserService):
     """
     Weibo capture sevice
     """
-    document_detail_page_comment_class = 'span[node-type="comment_btn_text"]'
     login_success_feature_url = 'http://account.weibo.com/set/index'
     login_page_url = 'http://weibo.com/login.php'
 
@@ -180,20 +193,61 @@ class WeiboCaptureService(BrowserService):
         if self.browser.current_url.startswith(settings.SINA_WEIBO_LOGIN_REDIRECT_PAGE):
             self.login_success = True
         else:
-            file_path = utils.generate_user_media_image_path(prefix='error')
+            file_path = os.path.join(settings.MEDIA_ROOT, utils.generate_user_media_image_path(prefix='error'))
             self.browser.save_screenshot(file_path)
             logger.error('WeiboCaptureService.do_login failed, please check screen shot file:' + file_path)
 
-    def capture_to_file(self, file_path):
+    def _fetch_url(self):
         """
-        Capture weibo url specified page to a file
+        If weibo login success then fetch url
         """
         if not self.login_success:
             raise WeiboNotLoginException()
 
         self.get(self.url)
-        self.find_element_visible_and_clickable(self.document_detail_page_comment_class)
-        self.browser.save_screenshot(file_path)
+
+    def _wait_feed_load_complete(self):
+        """
+        Wait feed load complete
+        """
+        self.find_element_visible_and_clickable('span[node-type="comment_btn_text"]')
+        self.find_element('.WB_text')
+
+        try:
+            self.browser.find_element_by_css_selector('.WB_expand_media_box')
+            self.find_element_visible_and_clickable('a[action-type="feed_list_media_toSmall"]').click()
+        except NoSuchElementException:
+            pass
+
+    def capture_to_file(self, file_path):
+        """
+        Capture weibo url specified page to a file
+        """
+        self._fetch_url()
+        self._wait_feed_load_complete()
+        self.screen_shot(file_path)
+
+    def capture_feed_to_file(self, file_path):
+        """
+        Capture document info, include author info and document info
+        """
+        self._fetch_url()
+        self._wait_feed_load_complete()
+
+        document_info_selector = '#plc_main'
+        info_location = self.find_element(document_info_selector).location
+
+        document_handle_selector = '.WB_feed_handle'
+        handler = self.find_element(document_handle_selector)
+        handler_location = handler.location
+        handler_size = handler.size
+
+        self.screen_shot(file_path)
+        utils.crop_image(file_path,
+                         info_location['x'] - 3,
+                         info_location['y'] - 3,
+                         handler_size['width'] + 6,
+                         handler_location['y'] + handler_size['height'] - info_location['y'] + 6)
 
     @staticmethod
     def get_media_relative_path_by(base64_media_path, default=settings.DEFAULT_WEIBO_CAPTURE_IMAGE):

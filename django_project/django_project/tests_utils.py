@@ -1,11 +1,11 @@
 import os
 import mock
 import redis_lock
-
+from PIL import Image
 from django.conf import settings
 from django.test import TestCase
 from django_redis import get_redis_connection
-from django_project.utils import generate_user_media_image_path, get_chrome_resource
+from django_project.utils import generate_user_media_image_path, get_chrome_resource, crop_image
 
 
 class GenerateUserMediaPathTest(TestCase):
@@ -67,3 +67,23 @@ class GetChromeResourceTest(TestCase):
         lock, path = get_chrome_resource()
         self.assertIsNone(lock)
         self.assertTrue(expected_path, path)
+
+
+class CropImageTest(TestCase):
+    """
+    Test case for crop image
+    """
+    @mock.patch.object(Image, 'open')
+    def test_crop_image(self, mock_image_open):
+        mock_crop_image = mock.Mock()
+        mock_base_image = mock.Mock(crop=mock.Mock(return_value=mock_crop_image))
+        mock_base_image.resize.return_value = mock_base_image
+        mock_image_open.return_value = mock_base_image
+        file_path = 'abc.jpeg'
+
+        crop_image(file_path, 1, 2, 3, 4)
+        mock_image_open.assert_called_once_with(file_path)
+        mock_base_image.crop.assert_called_once_with((1, 2, 4, 6))
+        mock_base_image.resize.assert_called_once_with(mock_crop_image.size)
+        mock_base_image.paste.assert_called_once_with(mock_crop_image)
+        mock_base_image.save.assert_called_once_with(file_path)

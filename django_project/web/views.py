@@ -26,11 +26,15 @@ class WeiboCaptureView(FormView):
         When form valid, save it to view
         """
         url = form.cleaned_data['url']
+        crop_feed = form.cleaned_data['crop_feed']
         service = WeiboCaptureService(url, auto_login=True)
         self.user_media_path = utils.generate_user_media_image_path(name='capture', prefix='weibo')
         file_path = os.path.join(settings.MEDIA_ROOT, self.user_media_path)
         try:
-            service.capture_to_file(file_path)
+            if crop_feed:
+                service.capture_feed_to_file(file_path)
+            else:
+                service.capture_to_file(file_path)
         except TimeoutException:
             logger.warning('WeiboCaptureView.form_valid get TimeoutException')
             os.remove(file_path)
